@@ -25,9 +25,11 @@ module Phrasing
   mattr_accessor :route
   mattr_accessor :staging_server_endpoint
   mattr_accessor :parent_controller
+  mattr_accessor :enabled
 
   @@parent_controller = "ApplicationController"
   @@route = 'phrasing'
+  @@enabled = true
 
   def self.log
     @@log

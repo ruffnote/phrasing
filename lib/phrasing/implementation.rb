@@ -3,6 +3,7 @@ module Phrasing
     # this method overrides part of the i18n gem, lib/i18n/backend/simple.rb
     def lookup(locale, key, scope = [], options = {})
       return super unless ActiveRecord::Base.connected? && PhrasingPhrase.table_exists?
+      return super unless Phrasing.enabled
 
       scoped_key = I18n.normalize_keys(nil, key, scope, options[:separator]).join(".")
 
