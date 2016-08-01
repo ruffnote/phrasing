@@ -11,8 +11,8 @@ class PhrasingPhrase < ActiveRecord::Base
   def self.search_i18n_and_create_phrase key
     begin
       value = I18n.t key, raise: true, fallback: false
-      PhrasingPhrase.where(key: key, locale: I18n.locale).first
-    rescue I18n::MissingTranslationData
+      PhrasingPhrase.find_by!(key: key, locale: I18n.locale)
+    rescue I18n::MissingTranslationData, ActiveRecord::RecordNotFound
       create_phrase(key)
     end
   end
