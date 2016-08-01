@@ -10,7 +10,7 @@ class PhrasingPhrase < ActiveRecord::Base
 
   def self.search_i18n_and_create_phrase key
     begin
-      value = I18n.t key, raise: true
+      value = I18n.t key, raise: true, fallback: false
       PhrasingPhrase.where(key: key, locale: I18n.locale).first
     rescue I18n::MissingTranslationData
       create_phrase(key)
