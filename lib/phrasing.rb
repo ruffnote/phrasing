@@ -26,6 +26,8 @@ module Phrasing
   mattr_accessor :staging_server_endpoint
   mattr_accessor :parent_controller
   mattr_accessor :enabled
+  mattr_accessor :username
+  mattr_accessor :password
 
   @@parent_controller = "ApplicationController"
   @@route = 'phrasing'
