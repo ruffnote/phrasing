@@ -36,7 +36,7 @@ class PhrasingPhrasesController < Phrasing.parent_controller.constantize
 
     respond_to do |format|
       format.html do
-        redirect_to phrasing_phrases_path, notice: "#{@phrasing_phrase.key} updated!"
+        redirect_to phrasing_phrases_path(locale: @phrasing_phrase.locale), notice: "#{@phrasing_phrase.key} updated!"
       end
 
       format.js do
