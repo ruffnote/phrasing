@@ -128,6 +128,7 @@ var editor = (function() {
 	
 	function updateBubblePosition() {
 		var selection = window.getSelection();
+		if (!selection || selection.rangeCount === 0) return;
 		var range = selection.getRangeAt(0);
 		var boundary = range.getBoundingClientRect();
 		
