@@ -14,6 +14,22 @@ module Phrasing
         ::Rails.application.config.assets.paths << ::Rails.root.join('app', 'assets', 'images')
         ::Rails.application.config.assets.precompile += ['editor.js', 'phrasing_engine.css', 'phrasing_engine.js', 'icomoon.dev.svg', 'icomoon.svg', 'icomoon.eot', 'icomoon.ttf', 'icomoon.woff', 'phrasing_icon_edit_all.png']
       end
+
+      initializer :routes do
+        ::Rails.application.routes.prepend do
+          resources Phrasing.route, as: 'phrasing_phrases', controller: 'phrasing_phrases', only: [:index, :edit, :update, :destroy] do
+            collection do
+              get 'help'
+              get 'import_export'
+              get 'sync'
+              get 'download'
+              post 'upload'
+              put 'remote_update_phrase'
+            end
+          end
+          resources :phrasing_phrase_versions, as: 'phrasing_phrase_versions', controller: 'phrasing_phrase_versions', only: [:destroy]
+        end
+      end
     end
   end
 end
