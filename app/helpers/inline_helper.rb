@@ -1,4 +1,6 @@
+# rubocop:disable all
 module InlineHelper
+  include ActionView::Helpers::TranslationHelper
 # Normal phrase
 # phrase("headline", url: www.infinum.co/yabadaba, inverse: true, interpolation: {min: 15, max: 20}, scope: "models.errors")
 
@@ -16,17 +18,29 @@ module InlineHelper
   end
 
   def inline(record, field_name, options={})
-    return record.send(field_name).to_s.html_safe unless can_edit_phrases?
+    key = record.try(:key).to_s
+    safe_field_record = record.send(field_name).to_s.tap do |str|
+      if key.end_with?('_html')
+        break str.html_safe
+      end
+    end
+    return safe_field_record unless can_edit_phrases?
+    return safe_field_record if options[:unphrasable]
 
-    klass = 'phrasable'
-    klass += ' phrasable_on' if edit_mode_on?
-    klass += ' inverse' if options[:inverse]
-    klass += options[:class] if options[:class]
+    klasses = ['phrasable']
+    klasses << 'phrasable_on' if edit_mode_on?
+    klasses << 'inverse' if options[:inverse]
+    klasses << options[:class] if options[:class]
+    klass = klasses.join ' '
 
     url = phrasing_polymorphic_url(record, field_name)
 
     content_tag(:span, { class: klass, contenteditable: edit_mode_on?, spellcheck: false,   "data-url" => url}) do
-      (record.send(field_name) || record.try(:key)).to_s.html_safe
+      if record.send(field_name)
+        safe_field_record
+      else
+        key
+      end
     end
   end
 
@@ -35,12 +49,13 @@ module InlineHelper
   private
 
     def phrasing_phrase(key, options = {})
-      key = options[:scope] ? "#{options[:scope]}.#{key}" : key.to_s
+      key = scope_key_by_partial(key)
+      key = options[:scope] ? "#{[options[:scope]].flatten.join('.')}.#{key}" : key.to_s
       if can_edit_phrases?
         @record = PhrasingPhrase.where(key: key, locale: I18n.locale.to_s).first || PhrasingPhrase.search_i18n_and_create_phrase(key)
         inline(@record, :value, options)
       else
-        options.try(:[], :interpolation) ? t(key, options[:interpolation]).html_safe : t(key).html_safe
+        options.try(:[], :interpolation) ? translate(key, options[:interpolation]).html_safe : translate(key, options).html_safe
       end
     end
 
